@@ -24,28 +24,28 @@
    strikethrough — never by colour alone. */
 :root{
   --bg:#0B0D0C; --panel:#101312; --fg:#C7CCC4; --dim:#798177; --line:#1F2422;
-  --amber:#E0A33C; --rule:#242B27;
+  --amber:#E0A33C; --rule:#242B27; --track:#3A423D;
   --done:#3CA059; --partial:#BD891C; --todo:#3890D2; --blocked:#B24037;
   --dead:#74716B; --unv:#B13290;
   --scan:rgba(200,255,215,.020); --hl:rgba(224,163,60,.09);
 }
 @media (prefers-color-scheme:light){:root{
-  --bg:#FBFBFA; --panel:#FFFFFF; --fg:#161A17; --dim:#5F675E; --line:#E2E4DF;
-  --amber:#9A5B12; --rule:#D8DBD5;
+  --bg:#C8CAC6; --panel:#D6D8D3; --fg:#161A17; --dim:#525A51; --line:#B4B7B1;
+  --amber:#8A5110; --rule:#A9ADA6; --track:#989D94;
   --done:#2A904B; --partial:#B27F02; --todo:#1777B8; --blocked:#A12721;
   --dead:#8B8982; --unv:#69308C;
   --scan:transparent; --hl:rgba(154,91,18,.07);
 }}
 :root[data-theme=light]{
-  --bg:#FBFBFA; --panel:#FFFFFF; --fg:#161A17; --dim:#5F675E; --line:#E2E4DF;
-  --amber:#9A5B12; --rule:#D8DBD5;
+  --bg:#C8CAC6; --panel:#D6D8D3; --fg:#161A17; --dim:#525A51; --line:#B4B7B1;
+  --amber:#8A5110; --rule:#A9ADA6; --track:#989D94;
   --done:#2A904B; --partial:#B27F02; --todo:#1777B8; --blocked:#A12721;
   --dead:#8B8982; --unv:#69308C;
   --scan:transparent; --hl:rgba(154,91,18,.07);
 }
 :root[data-theme=dark]{
   --bg:#0B0D0C; --panel:#101312; --fg:#C7CCC4; --dim:#798177; --line:#1F2422;
-  --amber:#E0A33C; --rule:#242B27;
+  --amber:#E0A33C; --rule:#242B27; --track:#3A423D;
   --done:#3CA059; --partial:#BD891C; --todo:#3890D2; --blocked:#B24037;
   --dead:#74716B; --unv:#B13290;
   --scan:rgba(200,255,215,.020); --hl:rgba(224,163,60,.09);
@@ -84,6 +84,17 @@ a{color:var(--amber)}
 @media (prefers-reduced-motion:reduce){.caret{animation:none}}
 .meter{margin:9px 0 3px;letter-spacing:-.02em;white-space:pre;overflow-x:auto}
 .meter .d{color:var(--done)}.meter .p{color:var(--partial)}.meter .r{color:var(--line)}
+/* The bar is 80 fixed glyphs, so its WIDTH is purely its font-size — clamped to the
+   viewport it spans most of the panel on a monitor and still fits a phone without the
+   horizontal scroll the 40-glyph version needed. */
+.meter .bg{font-size:clamp(6.5px,1.5vw,15px);letter-spacing:0}
+/* The unfilled track gets its OWN token, not a borrowed rule/line colour: those are
+   sized for hairline borders, and at 80 solid glyphs they disappeared into the panel —
+   the bar read as a short one and understated how much is left. --track is deliberately
+   lighter than any border in the palette, because it is filling AREA, not drawing a
+   line. Change it here, not at the usage site. */
+.meter .bg .r{color:var(--track)}
+.meter .hd{color:var(--amber)}   /* leading edge — same amber as ◂ HERE */
 .meter .pc{color:var(--fg)}
 .kpi{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--dim);margin-top:8px}
 .kpi b{color:var(--fg);font-weight:700;font-variant-numeric:tabular-nums}
@@ -111,7 +122,7 @@ tbody tr:last-child td{border-bottom:0}
 tr.wv td{background:var(--bg);color:var(--dim);font-size:11px;letter-spacing:.09em;
   text-transform:uppercase;padding:9px 11px;white-space:nowrap}
 tr.wv .wb{letter-spacing:-.02em}
-tr.wv .wb .d{color:var(--done)}tr.wv .wb .p{color:var(--partial)}tr.wv .wb .r{color:var(--line)}
+tr.wv .wb .d{color:var(--done)}tr.wv .wb .p{color:var(--partial)}tr.wv .wb .r{color:var(--track)}
 .st{color:var(--dim);font-variant-numeric:tabular-nums;width:1%;white-space:nowrap}
 .id{color:var(--dim);white-space:nowrap}
 .ep{color:var(--dim);white-space:nowrap}
@@ -128,6 +139,20 @@ tr.here .ti::after{content:" ◂ HERE";color:var(--amber);font-weight:700}
 .p-blocked{color:var(--blocked)}
 .p-dead{color:var(--dead)}
 .p-unverified{color:var(--unv)}
+/* ── Milestone groups ─────────────────────────────────────────────────────────────
+   The increments of a milestone are its detail, not its peers: crowded at the same
+   indent, twenty M9 rows bury the six milestones around them. The header row gets a
+   caret + a done/total count so a SHUT group still says how far it is; the children
+   indent under a left rule so the subordination reads without a box. */
+.gt{all:unset;cursor:pointer;display:block;width:100%}
+.gt::before{content:"▸ ";color:var(--amber)}
+tr.ms.open .gt::before{content:"▾ "}
+.gt:hover{color:var(--amber)}
+.gt:focus-visible{outline:1px solid var(--amber);outline-offset:2px}
+.kc{margin-left:9px;color:var(--dim);font-weight:400;font-size:11px;letter-spacing:.04em}
+tr.inc td.st,tr.inc td.id{color:var(--dim)}
+tr.inc td.ti{padding-left:20px;border-left:1px solid var(--rule)}
+.mw{color:var(--dim);font-size:11px;letter-spacing:.04em}
 .blk{display:block;margin-top:4px;color:var(--blocked)}
 .ev{display:block;margin-top:4px;color:var(--dim);opacity:.85}
 h2{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--fg);
@@ -190,6 +215,9 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
   tr[data-status] td.ti{display:block;font-size:14px;font-weight:700;margin:5px 0 4px;min-width:0}
   tr[data-status] td.rl{display:block;margin-top:7px;padding-top:7px;
     border-top:1px dotted var(--rule);min-width:0}
+  /* Cards can't indent via a table cell, so the whole card steps in instead. */
+  tr[data-status].inc{margin-left:14px;border-left:2px solid var(--rule)}
+  tr[data-status].inc td.ti{padding-left:0;border-left:0}
   tr.wv{display:block}
   tr.wv td{display:block;padding:13px 2px 6px;white-space:normal}
   tr.here{box-shadow:inset 3px 0 0 var(--amber)}
@@ -212,7 +240,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <div class="panel">
 <div class="cmd">shapers@v1:~$ <b>roadmap --current</b></div>
 <div class="cur"><span class="step">STEP 14</span> <span class="cid">&middot; M9-INC1 &middot;</span> A1 — The Ember anchor (owner-led: concept → model → in-engine)<span class="caret"></span></div>
-<div class="meter"><span class="pc">47%</span> <span class="d">███████████████████</span><span class="p">▒</span><span class="r">░░░░░░░░░░░░░░░░░░░░</span></div>
+<div class="meter" title="Milestone-weighted: each of the 10 live milestones is worth one unit; its increments fill only its own unit."><span class="pc">80%</span> <span class="bg"><span class="d">████████████████████████████████████████████████████████████████</span><span class="hd">▌</span><span class="r">░░░░░░░░░░░░░░░</span></span> <span class="mw">of 10 milestones</span></div>
 <div class="kpi"><span><span class="sw" style="background:var(--done)"></span><b>17</b> done</span><span><span class="sw" style="background:var(--partial)"></span><b>1</b> partial</span><span><span class="sw" style="background:var(--todo)"></span><b>15</b> not started</span><span><span class="sw" style="background:var(--blocked)"></span><b>3</b> blocked</span><span><span class="sw" style="background:var(--dead)"></span><b>1</b> dead</span><span><b>36</b> live of <b>37</b> steps</span></div>
 </div>
 <div class="bar-row">
@@ -229,7 +257,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <span class="shown" id="n-steps"></span>
 </div>
 <div class="scroll"><table id="steps"><thead><tr><th>Step</th><th>ID</th><th>Epic</th><th>Title</th><th>Status</th><th>Reality / notes</th></tr></thead><tbody>
-<tr class="wv"><td colspan="6">Phase A — build the fight &nbsp;<span class="wb"><span class="d">████████████</span></span> 6/6</td></tr>
+<tr class="wv"><td colspan="6">Phase A — build the fight &nbsp;<span class="wb"><span class="d">████████████</span></span> 6/6 milestones</td></tr>
 <tr data-status="done" class="">
 <td class="st">1</td>
 <td class="id">M1</td>
@@ -278,7 +306,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl">DONE (two-peer verified from the client seat 2026-07-15)</td></tr>
-<tr class="wv"><td colspan="6">Phase B — opponents &amp; session &nbsp;<span class="wb"><span class="d">████████████</span></span> 1/1</td></tr>
+<tr class="wv"><td colspan="6">Phase B — opponents &amp; session &nbsp;<span class="wb"><span class="d">████████████</span></span> 1/1 milestones</td></tr>
 <tr data-status="done" class="">
 <td class="st">7</td>
 <td class="id">M7</td>
@@ -287,16 +315,16 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">DONE (2026-07-17) — inc 1 (seam) · inc 2a (NavMesh nav) · inc 2b (bot platform traversal) DEFERRED · …</span><span class="lb">note</span></summary><div class="nb">DONE (2026-07-17) — inc 1 (seam) · inc 2a (NavMesh nav) · inc 2b (bot platform traversal) DEFERRED · inc 3 (competence + difficulty dial) · inc 4 (mode select + room code + difficulty slider) two-peer verified · feel pass (0.75 judged)</div></details></td></tr>
-<tr class="wv"><td colspan="6">Phase C — make it good &nbsp;<span class="wb"><span class="d">███</span><span class="r">░░░░░░░░░</span></span> 5/20</td></tr>
-<tr data-status="done" class="">
+<tr class="wv"><td colspan="6">Phase C — make it good &nbsp;<span class="wb"><span class="d">████</span><span class="r">░░░░░░░░</span></span> 1/3 milestones</td></tr>
+<tr data-status="done" class="ms" data-group="M8">
 <td class="st">8</td>
 <td class="id">M8</td>
 <td class="ep">Milestone</td>
-<td class="ti">Client-seat verification &amp; conditional netcode hardening</td>
+<td class="ti"><button class="gt" aria-expanded="false" aria-label="Toggle M8 increments">Client-seat verification &amp; conditional netcode hardening<span class="kc">4/4 increments</span></button></td>
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">DONE (2026-07-19). Exit artifact: Docs/m8/VERDICT.md. Reconciled plan + decision tree: ROADMAP → M8 …</span><span class="lb">note</span></summary><div class="nb">DONE (2026-07-19). Exit artifact: Docs/m8/VERDICT.md. Reconciled plan + decision tree: ROADMAP → M8 PLAN. inc 1 (flight recorder + Gate 0) — S1 clean, and it found the stale-collider hit-reg bug · inc 2 (dummy + latency sweep) RUN 2026-07-18 (49c391c) — 284 shots, five client rounds at measured RTT 15/32/56/114/184 ms plus a zero-latency host-seat control. VERDICT: BRANCH A + BRANCH C, split cleanly between slope and intercept; evidence in Docs/m8/ · inc 3 (conditional work per verdict) DONE — the blocker was never actually cleared until 2026-07-19: the Hitbox bake (8eb9a62) was necessary but not sufficient, because LagCompensation.Enabled was false in the Fusion project config, so TotalHitboxes stayed 0 and lag comp had never once executed. Measured after enabling it (evidence + caveats in Docs/m8/sim/): at ~113 ms a scripted client landed 53% with rewind vs 3% without (one binary, one aim rule, -m8ForcePhysX the only difference), and Gate 0 phantom misses fell 11.0% → 8.7% → 2.5% → 0% across three distinct Branch-D bugs (stale colliders, the muzzle spawning inside the target&#x27;s hurtbox, and a body→muzzle gap that let you shoot through cover) · inc 4 (S3/S4 + VERDICT DOC) DONE 2026-07-19, evidence in Docs/m8/inc4/: U7 resolved POSITIVE from Fusion&#x27;s own metadata (hitbox active state IS historized per tick), so the shield now rides the rewind — which changes 18% of guard verdicts, in both directions, at ~180 ms; I7 shipped (AimPoint validated against the reported look line, zero clamps on legitimate play); S3 human client-seat verdict is POSITIVE at 116 ms (V1TEST-SEAT → built); S4 passed both owed SHIELD-CONE two-peer checks; packet-loss regression passes. Branch B and Branch E did NOT fire and are NOT cleared — see the verdict doc for why each is a weak negative rather than a clearance. Out-of-scope tuning shipped deliberately on the S3 feel pass (FB-STARTUP 0.35→0.42, FB-SPEED 27→30, cannon telegraph 0.40→0.50); all M8 evidence predates those constants, and the one coupling that mattered (FB-SPEED↔hit-reg) was tested, not argued.</div></details></td></tr>
-<tr data-status="done" class="">
+<tr data-status="done" class="inc" data-child="M8">
 <td class="st">9</td>
 <td class="id">M8-INC1</td>
 <td class="ep">M8 increment</td>
@@ -304,7 +332,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">Ledger + ring buffer + HUD, then S1. Zero gameplay-code risk. Landed 2026-07-18 (9399a30). Gate 0 clean …</span><span class="lb">note</span></summary><div class="nb">Ledger + ring buffer + HUD, then S1. Zero gameplay-code risk. Landed 2026-07-18 (9399a30). Gate 0 clean as literally specified — S1 recorded zero misses on a stationary target — but REFINED BY INC 2: the MOVING case at 0 ms is NOT clean (2/27 host-seat connections scored WALL). S1 could not have caught that by construction, since the stale-collider bug needs a moving target. Read this line together with Inc 2&#x27;s Gate 0 finding, not on its own. It also surfaced the stale-collider hit-reg bug (Physics.autoSyncTransforms off) — a genuine Branch D find, caught exactly where the plan said it would be, and stopgapped with Physics.SyncTransforms().</div></details></td></tr>
-<tr data-status="done" class="">
+<tr data-status="done" class="inc" data-child="M8">
 <td class="st">10</td>
 <td class="id">M8-INC2</td>
 <td class="ep">M8 increment</td>
@@ -312,7 +340,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">This run is the branch determination. RUN 2026-07-18 (49c391c); evidence in Docs/m8/, parser …</span><span class="lb">note</span></summary><div class="nb">This run is the branch determination. RUN 2026-07-18 (49c391c); evidence in Docs/m8/, parser tools/m8_ledger.py. VERDICT: BRANCH A + BRANCH C, split cleanly between slope and intercept. 284 shots: five client rounds at measured RTT 15/32/56/114/184 ms plus a zero-latency host-seat control (a SoloDummy mode had to be added — in Host+Dummy the host&#x27;s own slot is the dummy, so nobody can shoot from the host seat).</div></details></td></tr>
-<tr data-status="done" class="">
+<tr data-status="done" class="inc" data-child="M8">
 <td class="st">11</td>
 <td class="id">M8-INC3</td>
 <td class="ep">M8 increment</td>
@@ -320,7 +348,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">(I5 and/or I6 and/or D-fixes), each with its own re-run falsifier. CLOSED 2026-07-19 by Inc 4&#x27;s human …</span><span class="lb">note</span></summary><div class="nb">(I5 and/or I6 and/or D-fixes), each with its own re-run falsifier. CLOSED 2026-07-19 by Inc 4&#x27;s human session (Docs/m8/inc4/s3-host.log): the client seat reported that shots register, at 116 ms measured. Read the falsifier note at the end of this increment for what that does and does NOT discharge. I5 is live and its effect is measured. Evidence, instruments and caveats: Docs/m8/sim/. Summary of what changed and what it bought: - Lag compensation had never executed. NetworkProjectConfig.LagCompensation.Enabled was false, so TotalHitboxes stayed 0 and Fireball correctly — and silently — used the PhysX fallback. The bake below was necessary but not sufficient, and the &quot;should now auto-upgrade&quot; line under it was wrong. Enabled via M8NetConfig.Apply -m8LagComp on; proof is hit-reg = LAG-COMP in every run log since. - Branch A, answered decisively. Scripted client shooter (-playtestMode JoinShooter) vs the strafe dummy, one binary, one aim rule, -m8ForcePhysX as the only difference: at ~113 ms the client landed 39/73 (53%) with rewind and 2/71 (3%) without it. Both arms show the same ~1.4–1.7 m present-position miss trailing the target at 92–94%, so the geometry is identical and only the adjudication differs — the client seat is unplayable at realistic ping without rewind, and playable with it. - Branch D, measured on the baseline&#x27;s own metric. BotDuel A/B at zero latency: phantom misses among geometric connections fell 8.7% → 2.5%. The control&#x27;s 8.7% independently reproduces the committed baseline&#x27;s 11.0%, which is what identifies it as the same bug rather than a new one. - The residual was a NEW class, not a smaller one — DIAGNOSED AND FIXED 2026-07-19, phantom rate now 0%. What survived lag comp was dead-centre (miss 0.00–0.12 m) at point-blank (0.5–0.8 m), concentrated in AIRATTACK/CHAIN — not the capsule-edge tunnelling the baseline documented. Cause: the projectile was spawning INSIDE the target&#x27;s hurtbox. FirePoint is 1.2 m in front of the shooter and the target capsule&#x27;s radius is 0.5, so from ~0.87 m inward the muzzle is inside the opponent&#x27;s body, and a ray originating inside a collider never reports it — the shot passed through and struck the wall behind. The data localised it before the arithmetic explained it: every phantom was under 1 m (0 of 290 above), and within that band off-centre shots landed 13/13 while dead-centre landed 4/10, which is the signature of muzzle containment and of nothing else on the suspect list. Fixed by testing containment at the segment start before the swept ray, through one shared contact resolver so a guard still blocks. Verified: 189 shots, 0 phantoms at every range and ability; dead-centre close range 4/10 → 6/6. Full write-up, caveats and severity note in Docs/m8/sim/README.md. - WHY THIS IS [~] AND NOT [x]: the falsifier below asks for S2 re-run identically by a human. This is a scripted instrument on a combat model the baseline never measured, and it deliberately removes Branch C, so it cannot answer the feel half. V1TEST-SEAT stays partial and Inc 4 still owes the human client-seat verdict. What Inc 3 has earned is the netcode half, with evidence. UNBLOCKED 2026-07-18 — the sweep decided it. SHIP: I5 (lag comp) + the Branch-D fix, TOGETHER, because they are one piece of work: LagCompensation.Raycast with SubtickAccuracy hitboxes removes the execution-order race behind the 11% phantom misses and supplies the rewind Branch A needs. Shipping lag comp alone would partially mask the D residual — the failure this plan warned about from the start. Do NOT ship I6 or any speed/size tuning: Branch C came back as the game working, and Branch B is Gate 2&#x27;s call at Inc 4, not this increment&#x27;s. - First blocker — the hitbox bake — is CLEARED (2026-07-18, 8eb9a62). Player.prefab&#x27;s HitboxRoot and capsule Hitbox were never linked to each other (Hitbox.Root null, HitboxRoot.Hitboxes empty), so TotalHitboxes was 0 and the code correctly fell back to PhysX — confirmed live by the ledger&#x27;s hit-reg = PhysX fallback line. Cause: Fusion&#x27;s NetworkObjectBaker never mentions Hitbox at all (checked against the shipped source, not assumed), so no number of reimports was ever going to link it. Assets/Editor/HitboxBaker.cs now does it headlessly via -executeMethod; the graph is bidirectional and the bake is idempotent (a second run links 0 new refs and leaves the prefab byte-identical). - What that does and does NOT buy. It only makes the hitboxes registrable. Fireball.cs already carries the full lag-comp path gated on TotalHitboxes &gt; 0, so it should now auto-upgrade — but the runtime smoke test has NOT been run, and even hit-reg = LAG-COMP in the log would only prove registration, not that Branch A&#x27;s slope collapsed. I5 remains unverified; the falsifier below is the bar. - ⚠ CORRECTED 2026-07-19 — &quot;it should now auto-upgrade&quot; WAS FALSE. A second switch, NetworkProjectConfig.LagCompensation.Enabled, was false, so the bake could not register anything and the code stayed on PhysX. The caution in this bullet was right and its premise was wrong: it warned that a LAG-COMP log line would not prove the fix worked, while assuming the line would at least appear. It never had. The smoke test this bullet asked for is what found it — one run, one grep. The lesson is the bullet&#x27;s own: an unrun check is not a small debt, and &quot;should&quot; is not a state. - Falsifier, non-negotiable — HOW IT WAS ACTUALLY DISCHARGED, which is not how it was written. The literal instruction (&quot;re-run S2 identically&quot;) became impossible between writing and execution: TOPO-SHAPE replaced the attacking topology after the baseline was recorded, so no re-run can be identical to it. What was done instead, and why it is stronger for the netcode question: a scripted A/B holding aim, arena, dummy and latency constant and flipping ONLY the resolver (-m8ForcePhysX), which is better controlled than two human sessions could ever be — 53% vs 3% at ~113 ms. The FEEL half the falsifier also wanted was discharged separately by S3. Neither substitute is the original test; recording that honestly is the point. Original text follows: re-run S2 identically against the committed baseline in Docs/m8/ and read it with tools/m8_ledger.py. The client&#x27;s miss-vs-RTT slope must collapse toward the host control&#x27;s 0.58 m, and phantom misses must approach 0. The ~0.55 m Branch C intercept must NOT move — if it does, something was tuned that shouldn&#x27;t have been. The fix does not ship on vibes; it ships on the re-run. - FB-SPEED&#x27;s pending bump still waits on this: the speed↔hit-reg coupling means raising speed on the raw raycast widens the phantom-miss band.</div></details></td></tr>
-<tr data-status="done" class="">
+<tr data-status="done" class="inc" data-child="M8">
 <td class="st">12</td>
 <td class="id">M8-INC4</td>
 <td class="ep">M8 increment</td>
@@ -328,15 +356,15 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-done">[DONE]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">(the exit artifact): what was measured, which branches fired, how the client seat feels now, and Branch …</span><span class="lb">note</span></summary><div class="nb">(the exit artifact): what was measured, which branches fired, how the client seat feels now, and Branch E&#x27;s status (fired / not / not yet evaluable, and why). DONE 2026-07-19. THE EXIT ARTIFACT IS Docs/m8/VERDICT.md; Inc 4&#x27;s own evidence is Docs/m8/inc4/. Headlines: U7 resolved POSITIVE (hitbox active state is historized per tick — read out of Fusion&#x27;s metadata, not guessed), so the shield now rides the rewind, which changes 18% of guard verdicts in both directions at ~180 ms. I7 shipped (AimPoint validated against the reported look line; zero clamps on legitimate play). S3: the client seat reports that shots register at 116 ms — V1TEST-SEAT moves to built. S4: both owed SHIELD-CONE two-peer checks passed. Packet-loss regression passes (press→shot conversion 59.5% at 10% loss vs 60.1% clean; no duplicate records; chains genuinely fired). Branch B did not fire but is NOT cleared — the shared impact cue that made it likely is still there, and only 4 of 51 shots were blocked. Branch E did not fire and is NOT cleared — its gate is finally open, but the blind seat-swap protocol its trigger names was never run. - ⚠ OUT-OF-SCOPE TUNING SHIPPED, DELIBERATELY. The S3 feel pass asked for it and it was applied with the cost recorded: FB-STARTUP 0.35→0.42, FB-SPEED 27→30, cannon telegraph 0.40→0.50. All M8 evidence predates those constants. The one coupling that mattered — FB-SPEED to hit-reg — was tested, not argued: Gate 0 at 30 m/s holds at 0% phantom. - Two instrument findings outlive the milestone (both in the verdict doc): Gate 0&#x27;s phantom metric is unreadable from a human round at latency, and two published arithmetic derivations were computed with an interp delay ~5x smaller than the measured one.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="ms" data-group="M9">
 <td class="st">13</td>
 <td class="id">M9</td>
 <td class="ep">Milestone</td>
-<td class="ti">The Emberborn build (art + animation + readability at real fidelity)</td>
+<td class="ti"><button class="gt" aria-expanded="false" aria-label="Toggle M9 increments">The Emberborn build (art + animation + readability at real fidelity)<span class="kc">0/13 increments</span></button></td>
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl">upcoming</td></tr>
-<tr data-status="todo" class="here">
+<tr data-status="todo" class="here inc" data-child="M9">
 <td class="st">14</td>
 <td class="id">M9-INC1</td>
 <td class="ep">M9 increment</td>
@@ -344,7 +372,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">art direction §3.4. Ember red, saturated but darker; coiled/forward/angular temperament …</span><span class="lb">note</span></summary><div class="nb">art direction §3.4. Ember red, saturated but darker; coiled/forward/angular temperament; smooth-warm-megalithic; mid-poly, no bake pipeline. Which tools, how many iterations, and when it is right are ALL the owner&#x27;s call. Owner: Trevor · Seat: the owner&#x27;s eye · Done when: Trevor judges it right — no threshold, no timebox, no sign-off. Provenance entries logged as assets are generated (disclosure/IP hygiene, not a gate).</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">15</td>
 <td class="id">M9-INC2</td>
 <td class="ep">M9 increment</td>
@@ -352,7 +380,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">SKEL-AIR. Auto-rig (Mixamo) or hand-rig the anchor, retarget the clip set onto it, confirm it deforms …</span><span class="lb">note</span></summary><div class="nb">SKEL-AIR. Auto-rig (Mixamo) or hand-rig the anchor, retarget the clip set onto it, confirm it deforms cleanly at the poses combat actually uses. Owner: Trevor + Code (import/retarget plumbing) · Seat: editor · Done: the rig deforms cleanly under the real clips — a genuine yes/no, because it is rigging, not taste. Dropped from the prior draft: the two-throwaway-bodies skeleton stress test. It existed to prove one skeleton spans four elements&#x27; proportion spread — an Alpha risk borrowed into an Ember-only milestone. If Ember&#x27;s own retarget misbehaves, that is the signal; revisit at Alpha when the other three actually exist.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">16</td>
 <td class="id">M9-INC3</td>
 <td class="ep">M9 increment</td>
@@ -360,7 +388,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">SKEL-AIR, §1.1/§1.2. idle · run · fireball wind-up · shield raise/hold · dodge · jump · land · …</span><span class="lb">note</span></summary><div class="nb">SKEL-AIR, §1.1/§1.2. idle · run · fireball wind-up · shield raise/hold · dodge · jump · land · hit-react (+ a shield-break stagger if wanted). Jump and dodge are ONE family (shared airborne primitive). Sourcing and quality bar are the owner&#x27;s call. Owner: Trevor + Code (wiring) · Seat: editor → host · Done: clips look right to Trevor AND satisfy the two SIM constraints — in-place (no root motion feeding the authoritative transform; Mixamo clips often ship with root motion baked in, so this bites more under Mixamo-first, not less) and speed-scaled to the server windows, never the reverse.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">17</td>
 <td class="id">M9-INC4</td>
 <td class="ep">M9 increment</td>
@@ -368,7 +396,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§8. Low-poly megalithic, warm and muted so the character reads against it. Layout and look are the …</span><span class="lb">note</span></summary><div class="nb">§8. Low-poly megalithic, warm and muted so the character reads against it. Layout and look are the owner&#x27;s call. Owner: Trevor + Code (import/scale) · Seat: editor → host · Done when: Trevor judges it right. Two sim constraints only — preserve the cover read (occluders still stop shots and block aim) and any resize is UNIFORM on the Arena root (non-uniform breaks colliders). Triggers G2 + the NavMesh/jump-link re-bake.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">18</td>
 <td class="id">M9-INC5</td>
 <td class="ep">M9 increment</td>
@@ -376,7 +404,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">SKEL-STATES, SKEL-TICKTIMER. Add the small missing reads (consolidated Action+Phase …</span><span class="lb">note</span></summary><div class="nb">SKEL-STATES, SKEL-TICKTIMER. Add the small missing reads (consolidated Action+Phase — PlayerCombat.cs:219-220 are private — plus phase-normalized time) so clips speed-scale to the live server window. Reuse the existing derived reads; no new networked state. Owner: Code · Seat: editor → two-peer once a rig consumes it · Done: an Animator selects clip + normalized time from public reads only; a code check confirms no clip length feeds a TickTimer and no clip displacement feeds the transform.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">19</td>
 <td class="id">M9-INC6</td>
 <td class="ep">M9 increment</td>
@@ -384,7 +412,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§9, SHIELD-BREAK. Replace the synth placeholders; KEEP the every-peer [Networked]-driven pattern (a …</span><span class="lb">note</span></summary><div class="nb">§9, SHIELD-BREAK. Replace the synth placeholders; KEEP the every-peer [Networked]-driven pattern (a local-only system would be a readability regression). Set: wind-up · release · impact · block · dodge whoosh · land · cooldown-ready. Open call: does the opponent hear YOUR cooldown-ready? Owner: Trevor (author) + Code (wire) · Seat: two-peer at real ping · Done: the M8 hole is closed — hit, block, and wall are audibly distinct.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">20</td>
 <td class="id">M9-INC7</td>
 <td class="ep">M9 increment</td>
@@ -392,7 +420,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§9. Replace PlayerHUD/MatchHUD/DamageNumbers/PauseMenu. Preserve the chain-state read (shot pips …</span><span class="lb">note</span></summary><div class="nb">§9. Replace PlayerHUD/MatchHUD/DamageNumbers/PauseMenu. Preserve the chain-state read (shot pips, window bar, cooldown tick). Owner: Trevor-editor + Code · Seat: host → two-peer smoke · Done: all four IMGUI surfaces retired; chain/shield/lockout reads intact; no functional regression across a full match.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">21</td>
 <td class="id">M9-INC8</td>
 <td class="ep">M9 increment</td>
@@ -400,7 +428,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§1.7, SHIELD-CONE, SHIELD-SIZE, FB-MUZZLE. Look is the owner&#x27;s call; the ONE sim constraint is honesty …</span><span class="lb">note</span></summary><div class="nb">§1.7, SHIELD-CONE, SHIELD-SIZE, FB-MUZZLE. Look is the owner&#x27;s call; the ONE sim constraint is honesty — don&#x27;t draw a guard wider than it blocks, and keep the projectile&#x27;s solid core inside its collider (glow may exceed it). Muzzle VFX also re-solves the FB-MUZZLE &quot;leaves from the chest&quot; debt. Owner: Trevor (VFX) + Code (bind to state / CannonWindup) · Seat: editor → host · Done: reads right to Trevor and doesn&#x27;t overstate the sim.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">22</td>
 <td class="id">M9-INC9</td>
 <td class="ep">M9 increment</td>
@@ -408,7 +436,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§9. Damage state currently pulses hue only, which colour-independent readability argues against. Route …</span><span class="lb">note</span></summary><div class="nb">§9. Damage state currently pulses hue only, which colour-independent readability argues against. Route it through the hit-react clip (A3) + a non-hue tell; keep the [Networked]-counter drive so every peer reacts on the same increments. Owner: Code + Trevor (clip) · Seat: two-peer · Done: damage is legible without relying on hue; sync preserved.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">23</td>
 <td class="id">M9-INC10</td>
 <td class="ep">M9 increment</td>
@@ -416,7 +444,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">§9. Dither/clip shader replaces the runtime material mutation. Separately, decouple the aim ray from …</span><span class="lb">note</span></summary><div class="nb">§9. Dither/clip shader replaces the runtime material mutation. Separately, decouple the aim ray from the cosmetic camera so the jump/dodge vertical spring cannot leak into aim — netcode-touching, and it surfaces now because the hero changes the camera-body relationship. Owner: Code · Seat: dither = editor/host; aim decouple = two-peer at real ping · Done: occluder fades via shader; a two-peer check shows the aim ray stable through an arc.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">24</td>
 <td class="id">M9-INC11</td>
 <td class="ep">M9 increment</td>
@@ -424,7 +452,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">HEAD-HITBOX, §1.3, §1.7. Art has authority over geometry: once the hero locks, RE-DERIVE the CC …</span><span class="lb">note</span></summary><div class="nb">HEAD-HITBOX, §1.3, §1.7. Art has authority over geometry: once the hero locks, RE-DERIVE the CC capsule, HEAD-HITBOX sphere and its 1.05× placement FROM the rig — never force the model to the placeholder&#x27;s numbers. Reuse the HeadHitboxBaker/HitboxBaker -executeMethod pattern. Owner: Code + Trevor-editor · Seat: editor → host · Done: no visible mesh outside a hurtbox, no hurtbox wider than the visible body, head/CC separation re-checked. This is sim correctness, so it IS a yes/no.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">25</td>
 <td class="id">M9-INC12</td>
 <td class="ep">M9 increment</td>
@@ -432,7 +460,7 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 <td><span class="pill p-todo">[TODO]</span>
 </td>
 <td class="rl"><details class="nt"><summary><span class="pk">HEAD-HITBOX, SHIELD-CONE. M8&#x27;s evidence (0% phantom rate, shield riding the rewind) was gathered …</span><span class="lb">note</span></summary><div class="nb">HEAD-HITBOX, SHIELD-CONE. M8&#x27;s evidence (0% phantom rate, shield riding the rewind) was gathered against the OLD geometry; G1 and A4 reopen it. Re-verify at real ping; re-bake NavMesh + jump links after any arena rescale. Owner: Code · Seat: two-peer at real ping · Done: hit-reg + shield-rewind reproduced on the new geometry; bot traverses and anti-airs unchanged.</div></details></td></tr>
-<tr data-status="todo" class="">
+<tr data-status="todo" class="inc" data-child="M9">
 <td class="st">26</td>
 <td class="id">M9-INC13</td>
 <td class="ep">M9 increment</td>
@@ -816,6 +844,19 @@ footer{margin-top:28px;color:var(--dim);border-top:1px solid var(--rule);padding
 function $(s,r){return (r||document).querySelector(s)}
 function $$(s,r){return [].slice.call((r||document).querySelectorAll(s))}
 
+// Which milestone groups are shut. Default: ALL of them — the page opens scannable at
+// the milestone level, and the one group you are actually working in is opened below.
+var COLLAPSED={};
+$$('tr.ms[data-group]').forEach(function(h){COLLAPSED[h.getAttribute('data-group')]=true});
+
+function syncGroups(searching){
+  $$('tr.ms[data-group]').forEach(function(h){
+    var id=h.getAttribute('data-group');
+    h.classList.toggle('open', searching || !COLLAPSED[id]);
+    var b=$('.gt',h); if(b) b.setAttribute('aria-expanded', String(searching||!COLLAPSED[id]));
+  });
+}
+
 function wire(tableId, btnAttr, countId){
   var rows=$$('#'+tableId+' tbody tr[data-status]');
   var btns=$$('button['+btnAttr+']');
@@ -828,6 +869,12 @@ function wire(tableId, btnAttr, countId){
     rows.forEach(function(r){
       var okS=(f==='all'||r.getAttribute('data-status')===f);
       var okQ=(!term||r.textContent.toLowerCase().indexOf(term)>=0);
+      // A collapsed group hides its children — but NEVER while a search is running: a
+      // row that matches and stays hidden reads as a broken filter, the same failure the
+      // auto-opened notes below exist to avoid. During a search every group is treated
+      // as open; the reader's own collapse state is remembered, not overwritten.
+      var par=r.getAttribute('data-child');
+      if(par&&!term&&COLLAPSED[par]) okS=okQ=false;
       var vis=okS&&okQ; r.style.display=vis?'':'none'; if(vis)n++;
       // A match inside a CLOSED note is a match you cannot see — the row survives the
       // filter for a reason nothing on screen explains. Open any note whose text
@@ -852,6 +899,7 @@ function wire(tableId, btnAttr, countId){
     });
     var c=$('#'+countId); if(c) c.textContent=n+'/'+rows.length+' shown';
     var em=$('#'+tableId+'-empty'); if(em) em.style.display=n?'none':'';
+    syncGroups(!!term);
   }
   btns.forEach(function(b){b.onclick=function(){
     btns.forEach(function(o){o.setAttribute('aria-pressed', o===b)});
@@ -863,6 +911,19 @@ function wire(tableId, btnAttr, countId){
 }
 
 var applySteps=wire('steps','data-f','n-steps');
+
+// The group you are standing in opens on load — a collapsed CURRENT step would hide the
+// one row the page exists to point at.
+(function(){
+  var h=$('tr.here');
+  var id=h&&(h.getAttribute('data-child')||h.getAttribute('data-group'));
+  if(id) COLLAPSED[id]=false;
+})();
+$$('tr.ms[data-group] .gt').forEach(function(b){
+  var id=b.closest('tr').getAttribute('data-group');
+  b.onclick=function(){COLLAPSED[id]=!COLLAPSED[id];applySteps()};
+});
+applySteps();
 var applyReqs =wire('reqs','data-g','n-reqs');
 
 // EXPAND / COLLAPSE ALL, scoped per table. The label names the ACTION the button will
@@ -903,8 +964,9 @@ var cr=$('#csvreq'); if(cr) cr.onclick=function(){csv(REQS,['id','req','status',
 var jump=$('#jump');
 if(jump) jump.onclick=function(){
   var h=$('tr.here'); if(!h) return;
-  // Clear any filter that would be hiding the current row before scrolling to it.
+  // Clear any filter — or collapsed group — that would be hiding the current row.
   if(h.style.display==='none'){
+    var par=h.getAttribute('data-child'); if(par) COLLAPSED[par]=false;
     $$('button[data-f]').forEach(function(o){o.setAttribute('aria-pressed', o.getAttribute('data-f')==='all')});
     $('#q').value=''; applySteps();
   }
